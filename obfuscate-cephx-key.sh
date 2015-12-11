@@ -18,6 +18,17 @@ fi
 # Take the sosreport file as a parameter
 [ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
 
+# Recommend root as sos likes to have odd permissions sometimes
+# and running as root is the easiest way around it
+if [ "$(id -u)" != "0" ]; then
+   echo "Warning: If script is not run as root, permission errors may occur"
+   read -p "Continue Y/N? " -n 1 -r
+   echo
+   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+     exit 1
+   fi
+fi
+
 # Extract the files to be edited from sosreport given as an argument
 if [ -e /bin/tar ]; then
   echo "Extracting $1 to a temporary directory inside $(pwd)..."
@@ -33,14 +44,16 @@ fi
 echo "Finding and replacing all instances of cephx auth keys, this may take a few moments to complete..."
 find obfuscate_tmp/sosreport-*/sos_commands/process/. -type f -exec sed -i 's/key=[^:]\+:/key=*******:/g' {} \;
 find obfuscate_tmp/sosreport-*/var/log/libvirt/qemu/. -type f -exec sed -i 's/key=[^:]\+:/key=*******:/g' {} \;
-echo "Done."
 
 # tar everything back up into a new sosreport marked as cleaned
 echo 'Creating a new sosreport with the cleaned files...'
-tar cJf cephx-cleaned-$(basename $1) obfuscate_tmp/sosreport-*
+cd obfuscate_tmp/
+tar cJf cephx-cleaned-$(basename $1) sosreport-*
+mv cephx-cleaned-$(basename $1) ..
+cd $OLDPWD
 
 # Remove obfuscate_tmp
 echo 'Cleaning up...'
-rm -rf obfuscate_tmp
+rm -rf obfuscate_tmp/
 echo "Done."
 echo "New sosreport created as cephx-cleaned-$(basename $1) in $(pwd)"
