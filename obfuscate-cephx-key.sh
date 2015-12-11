@@ -36,7 +36,11 @@ find obfuscate_tmp/sosreport-*/var/log/libvirt/qemu/. -type f -exec sed -i 's/ke
 echo "Done."
 
 # tar everything back up into a new sosreport marked as cleaned
-echo 'Creating a new sosreport with the cleaned files..'
-# We can't update a tarball, only a tar so we first need to extract the tar
-echo $1
-#tar cJf cephx_cleaned-$1
+echo 'Creating a new sosreport with the cleaned files...'
+tar cJf cephx-cleaned-$(basename $1) obfuscate_tmp/sosreport-*
+
+# Remove obfuscate_tmp
+echo 'Cleaning up...'
+rm -rf obfuscate_tmp
+echo "Done."
+echo "New sosreport created as cephx-cleaned-$(basename $1) in $(pwd)"
