@@ -25,7 +25,7 @@ if [ "$(id -u)" != "0" ]; then
    read -p "Continue Y/N? " -n 1 -r
    echo
    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-     exit 1
+     exit 0
    fi
 fi
 
