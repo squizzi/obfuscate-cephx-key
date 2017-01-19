@@ -8,7 +8,7 @@
 # /var/log/libvirt/qemu/*.log
 
 # This script will be obsolete when an errata for BZ #1245647 is released which
-# addresses the qemu vulnerability
+# addresses the qemu vulnerability.
 
 # The only required parameter is the sosreport you wish to clean
 if [ $# -ne 1 ]; then
